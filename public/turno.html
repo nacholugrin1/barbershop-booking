@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tu turno — Barbería Ramírez</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;700&family=Karla:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/turnos.css">
+</head>
+<body>
+
+  <header class="barra">
+    <div class="caja">
+      <a class="marca" href="https://aura-digitalstudio.github.io/aura-digital-studio/demos/barberia/">
+        <span class="marca-sigla">R</span>
+        <span class="marca-nombre">Barbería Ramírez</span>
+      </a>
+      <a class="volver" href="index.html">Sacar otro turno →</a>
+    </div>
+  </header>
+  <div id="aviso-demo" class="aviso-demo" hidden>
+    <div class="caja">Demo de portfolio: Barbería Ramírez es un negocio ficticio y no se envían mails reales.</div>
+  </div>
+
+  <main class="caja">
+    <div id="cargando" class="cargando">Buscando tu turno…</div>
+
+    <div id="contenido" hidden>
+      <h1 id="titulo">Tu turno</h1>
+      <p class="bajada" id="bajada"></p>
+
+      <div class="resumen">
+        <dl>
+          <dt>A nombre de</dt><dd id="d-nombre">—</dd>
+          <dt>Servicio</dt><dd id="d-servicio">—</dd>
+          <dt>Con</dt><dd id="d-barbero">—</dd>
+          <dt>Cuándo</dt><dd id="d-cuando">—</dd>
+          <dt>Dónde</dt><dd id="d-donde">—</dd>
+        </dl>
+      </div>
+
+      <div id="aviso" class="aviso oculto" role="status" aria-live="polite"></div>
+
+      <div class="acciones" id="acciones">
+        <button type="button" class="btn btn-peligro" id="btn-cancelar">No voy a poder ir — cancelar</button>
+        <a class="btn btn-suave" href="index.html">Reprogramar (sacar otro)</a>
+      </div>
+
+      <p class="pie">
+        Reprogramar todavía es en dos pasos: cancelás acá y sacás el nuevo turno.
+        Unificarlo en un solo botón está anotado para la próxima versión.
+      </p>
+    </div>
+
+    <div id="no-encontrado" hidden>
+      <h1>No encontramos ese turno</h1>
+      <p class="bajada">El link puede estar incompleto o el turno ya no existe. Escribinos y lo vemos.</p>
+      <div class="acciones"><a class="btn" href="index.html">Sacar un turno</a></div>
+    </div>
+  </main>
+
+  <script src="js/turno.js"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservar turno — Barbería Ramírez</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;700&family=Karla:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/turnos.css">
+</head>
+<body>
+
+  <header class="barra">
+    <div class="caja">
+      <a class="marca" href="https://aura-digitalstudio.github.io/aura-digital-studio/demos/barberia/">
+        <span class="marca-sigla">R</span>
+        <span class="marca-nombre">Barbería Ramírez</span>
+      </a>
+      <a class="volver" href="https://aura-digitalstudio.github.io/aura-digital-studio/demos/barberia/">← Volver al sitio</a>
+    </div>
+  </header>
+  <div id="aviso-demo" class="aviso-demo" hidden>
+    <div class="caja">Demo de portfolio: Barbería Ramírez es un negocio ficticio y no se envían mails reales.</div>
+  </div>
+
+  <main class="caja">
+
+    <nav class="pasos" aria-label="Pasos de la reserva">
+      <button type="button" class="paso-chip activo" data-ir="1">1 · Servicio</button>
+      <button type="button" class="paso-chip" data-ir="2">2 · Con quién</button>
+      <button type="button" class="paso-chip" data-ir="3">3 · Día y hora</button>
+      <button type="button" class="paso-chip" data-ir="4">4 · Tus datos</button>
+    </nav>
+
+    <div id="aviso-global" class="aviso error oculto" role="alert" aria-live="assertive"></div>
+
+    <!-- ===== Paso 1 ===== -->
+    <section class="panel visible" id="panel-1" aria-labelledby="t1">
+      <h1 id="t1">¿Qué te hacés?</h1>
+      <p class="bajada">Elegí el servicio. La duración es el tiempo real que te reservamos el sillón.</p>
+      <div class="opciones" id="lista-servicios">
+        <p class="cargando">Cargando servicios…</p>
+      </div>
+    </section>
+
+    <!-- ===== Paso 2 ===== -->
+    <section class="panel" id="panel-2" aria-labelledby="t2">
+      <h1 id="t2">¿Con quién?</h1>
+      <p class="bajada">Podés elegir a alguien puntual o dejar que te asignemos al primero que tenga lugar.</p>
+      <div class="opciones" id="lista-barberos"></div>
+      <div class="acciones">
+        <button type="button" class="btn btn-suave" data-atras="1">← Atrás</button>
+      </div>
+    </section>
+
+    <!-- ===== Paso 3 ===== -->
+    <section class="panel" id="panel-3" aria-labelledby="t3">
+      <h1 id="t3">¿Cuándo?</h1>
+      <p class="bajada">Solo mostramos horarios en los que entra el servicio completo antes de cerrar.</p>
+      <div class="fila-fecha">
+        <div style="flex:1 1 200px">
+          <label for="fecha">Día</label>
+          <input type="date" id="fecha">
+        </div>
+      </div>
+      <div id="zona-horarios" aria-live="polite">
+        <p class="cargando">Elegí un día para ver los horarios libres.</p>
+      </div>
+      <div class="acciones">
+        <button type="button" class="btn btn-suave" data-atras="2">← Atrás</button>
+      </div>
+    </section>
+
+    <!-- ===== Paso 4 ===== -->
+    <section class="panel" id="panel-4" aria-labelledby="t4">
+      <h1 id="t4">Tus datos</h1>
+      <p class="bajada">Con el mail te mandamos la confirmación y el link para cancelar si no podés venir.</p>
+
+      <div class="resumen" id="resumen">
+        <dl>
+          <dt>Servicio</dt><dd id="r-servicio">—</dd>
+          <dt>Con</dt><dd id="r-barbero">—</dd>
+          <dt>Cuándo</dt><dd id="r-cuando">—</dd>
+          <dt>Precio</dt><dd id="r-precio">—</dd>
+        </dl>
+      </div>
+
+      <form id="form-reserva" novalidate>
+        <div class="campos dos">
+          <div>
+            <label for="nombre">Nombre y apellido</label>
+            <input type="text" id="nombre" name="nombre" autocomplete="name" maxlength="80" required>
+          </div>
+          <div>
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" name="telefono" autocomplete="tel" maxlength="30" required>
+          </div>
+        </div>
+        <div class="campos">
+          <div>
+            <label for="email">Mail</label>
+            <input type="email" id="email" name="email" autocomplete="email" maxlength="120" required>
+          </div>
+          <div>
+            <label for="nota">Algo que quieras aclarar (opcional)</label>
+            <textarea id="nota" name="nota" maxlength="500" placeholder="Ej: vengo con mi hijo, o traigo una foto de referencia."></textarea>
+          </div>
+        </div>
+
+        <!-- Honeypot: invisible para personas, tentador para bots. -->
+        <div class="trampa" aria-hidden="true">
+          <label for="apellido2">No completar</label>
+          <input type="text" id="apellido2" name="apellido2" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div id="aviso-form" class="aviso error oculto" role="alert" aria-live="assertive"></div>
+
+        <div class="acciones">
+          <button type="submit" class="btn" id="btn-confirmar">Confirmar turno</button>
+          <button type="button" class="btn btn-suave" data-atras="3">← Atrás</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===== Confirmación ===== -->
+    <section class="panel" id="panel-listo" aria-labelledby="t5">
+      <div class="tilde" aria-hidden="true">✓</div>
+      <h1 id="t5">Listo. Te esperamos.</h1>
+      <p class="bajada" id="listo-detalle"></p>
+      <div class="resumen">
+        <dl>
+          <dt>Servicio</dt><dd id="l-servicio">—</dd>
+          <dt>Con</dt><dd id="l-barbero">—</dd>
+          <dt>Cuándo</dt><dd id="l-cuando">—</dd>
+        </dl>
+      </div>
+      <p class="aviso" id="l-mail"></p>
+      <div class="acciones">
+        <a class="btn" id="l-gestion" href="#">Ver o cancelar mi turno</a>
+        <a class="btn btn-suave" href="https://aura-digitalstudio.github.io/aura-digital-studio/demos/barberia/">Volver al sitio</a>
+      </div>
+    </section>
+
+    <p class="pie">
+      Si el sistema no anda, no te quedes sin turno: escribinos por WhatsApp o llamanos.
+      <span id="pie-contacto"></span>
+    </p>
+  </main>
+
+  <script src="js/reserva.js"></script>
+</body>
+</html>

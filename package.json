@@ -1,0 +1,26 @@
+{
+  "name": "turnos-barberia-ramirez",
+  "version": "1.0.0",
+  "description": "Sistema de turnos con backend propio (Node + Express + PostgreSQL) para el demo Barberia Ramirez",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrar": "node src/migrar.js",
+    "sembrar": "node src/sembrar.js",
+    "test": "node --test test/logica.test.js test/integracion.test.js",
+    "test:logica": "node --test test/logica.test.js",
+    "test:integracion": "node --test test/integracion.test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "nodemailer": "^6.9.16",
+    "pg": "^8.13.1"
+  }
+}

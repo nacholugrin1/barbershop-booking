@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel — Barbería Ramírez</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;700&family=Karla:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/turnos.css">
+  <style>
+    /* Estilos propios del panel: es una herramienta de trabajo, no una
+       vidriera. Denso, legible de un vistazo, pensado para el celular
+       apoyado al lado del sillón. */
+    .caja-panel { max-width: 960px; }
+    .turno-fila {
+      display: grid;
+      grid-template-columns: 68px 1fr auto;
+      gap: 10px 14px;
+      align-items: start;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--linea);
+    }
+    .turno-hora {
+      font-family: 'Zilla Slab', Georgia, serif; font-weight: 700; font-size: 1.15rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .turno-hora small { display: block; font-size: 0.72rem; font-weight: 400; color: var(--tinta-suave); font-family: 'Karla', sans-serif; }
+    .turno-quien { font-weight: 700; }
+    .turno-meta { font-size: 0.86rem; color: var(--tinta-suave); }
+    .turno-meta a { color: var(--tinta-suave); }
+    .turno-nota { font-size: 0.86rem; border-left: 2px solid var(--laton); padding-left: 10px; margin-top: 6px; }
+    .turno-botones { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+    .fila-cancelado { opacity: 0.5; }
+    .tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 18px 0 26px; }
+    .tarjeta { background: var(--verde); color: var(--papel); padding: 14px 16px; }
+    .tarjeta .n { font-family: 'Zilla Slab', Georgia, serif; font-size: 1.7rem; font-weight: 700; line-height: 1.1; }
+    .tarjeta .k { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--laton-claro); }
+    .barra-dia { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 6px; }
+    details.bloqueo { border: 1px solid var(--linea); padding: 14px 16px; margin-top: 30px; background: #fff; }
+    details.bloqueo summary { cursor: pointer; font-weight: 700; }
+    @media (max-width: 620px) {
+      .turno-fila { grid-template-columns: 60px 1fr; }
+      .turno-botones { grid-column: 1 / -1; flex-direction: row; align-items: flex-start; flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="barra">
+    <div class="caja caja-panel">
+      <a class="marca" href="index.html">
+        <span class="marca-sigla">R</span>
+        <span class="marca-nombre">Panel · Barbería Ramírez</span>
+      </a>
+      <button type="button" class="volver" id="btn-salir" hidden style="background:none;border:0;cursor:pointer;font:inherit">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="caja caja-panel" style="padding-top:30px;padding-bottom:70px">
+
+    <!-- ===== Login ===== -->
+    <section id="pantalla-login">
+      <h1>Entrar al panel</h1>
+      <p class="bajada">Solo para el dueño. Los turnos de los clientes no se ven desde acá sin iniciar sesión.</p>
+      <form id="form-login" style="max-width:360px">
+        <div class="campos">
+          <div>
+            <label for="usuario">Usuario</label>
+            <input type="text" id="usuario" autocomplete="username" required>
+          </div>
+          <div>
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" autocomplete="current-password" required>
+          </div>
+        </div>
+        <div id="login-error" class="aviso error oculto" role="alert" aria-live="assertive"></div>
+        <div class="acciones">
+          <button type="submit" class="btn" id="btn-entrar">Entrar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===== Panel ===== -->
+    <section id="pantalla-panel" hidden>
+      <div class="barra-dia">
+        <div>
+          <label for="dia">Día</label>
+          <input type="date" id="dia" style="width:auto">
+        </div>
+        <button type="button" class="btn btn-suave btn-chico" id="btn-hoy">Hoy</button>
+        <button type="button" class="btn btn-suave btn-chico" id="btn-ayer">← Día anterior</button>
+        <button type="button" class="btn btn-suave btn-chico" id="btn-manana">Día siguiente →</button>
+      </div>
+
+      <div class="tarjetas" id="tarjetas"></div>
+
+      <h2 id="titulo-dia" style="font-size:1.3rem;margin-bottom:6px">Turnos</h2>
+      <div id="aviso-panel" class="aviso oculto" role="status" aria-live="polite"></div>
+      <div id="lista-turnos"><p class="cargando">Cargando…</p></div>
+
+      <details class="bloqueo">
+        <summary>Cerrar un rato de la agenda</summary>
+        <p class="bajada" style="margin-top:12px">
+          Para vacaciones, un feriado o "me voy al médico el jueves a las 3".
+          Ese rato deja de ofrecerse a los clientes. No toca los turnos ya reservados.
+        </p>
+        <form id="form-bloqueo">
+          <div class="campos dos">
+            <div>
+              <label for="b-barbero">Quién</label>
+              <select id="b-barbero"><option value="">Todo el local</option></select>
+            </div>
+            <div>
+              <label for="b-fecha">Día</label>
+              <input type="date" id="b-fecha" required>
+            </div>
+            <div>
+              <label for="b-desde">Desde</label>
+              <input type="time" id="b-desde" value="09:00" required>
+            </div>
+            <div>
+              <label for="b-hasta">Hasta</label>
+              <input type="time" id="b-hasta" value="20:00" required>
+            </div>
+          </div>
+          <div class="campos">
+            <div>
+              <label for="b-motivo">Motivo (para acordarte después)</label>
+              <input type="text" id="b-motivo" maxlength="120" placeholder="Feriado, vacaciones, turno médico…">
+            </div>
+          </div>
+          <div id="bloqueo-aviso" class="aviso oculto" role="status" aria-live="polite"></div>
+          <div class="acciones"><button type="submit" class="btn">Cerrar ese rato</button></div>
+        </form>
+      </details>
+
+      <div id="resumen-quincena" class="pie"></div>
+    </section>
+  </main>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
