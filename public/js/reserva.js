@@ -22,6 +22,9 @@
     catalogo: null,
     servicio: null,
     barberoId: 'cualquiera',
+    // Barbero elegido desde el sitio (?barbero=hugo). Mientras siga vigente,
+    // el paso 2 se saltea para los servicios que esa persona hace.
+    preferido: null,
     fecha: '',
     hora: '',
     enviando: false,
@@ -36,6 +39,11 @@
   function mostrarAviso(el, texto) {
     el.textContent = texto;
     el.classList.remove('oculto');
+  }
+  /** Aviso informativo (no de error) arriba del flujo. */
+  function avisoInfo(texto) {
+    mostrarAviso(avisoGlobal, texto);
+    avisoGlobal.classList.remove('error');
   }
   function ocultarAviso(el) {
     el.textContent = '';
@@ -135,12 +143,29 @@
         '<span class="op-precio">' + pesos(s.precioArs) + '</span>';
       b.addEventListener('click', function () {
         estado.servicio = s;
-        // Si venía preseleccionado un barbero desde el sitio (?barbero=nico)
-        // se respeta, salvo que ese barbero no haga este servicio.
-        if (s.barberos.indexOf(estado.barberoId) < 0) estado.barberoId = 'cualquiera';
         estado.hora = '';
         cont.querySelectorAll('.opcion').forEach(function (o) { o.setAttribute('aria-pressed', 'false'); });
         b.setAttribute('aria-pressed', 'true');
+
+        var pref = estado.preferido;
+        if (pref && s.barberos.indexOf(pref) >= 0) {
+          // Vino desde "Reservar con Hugo" y Hugo hace este servicio:
+          // el paso 2 ya está respondido, se va directo a día y hora.
+          estado.barberoId = pref;
+          pintarBarberos();
+          avisoInfo('Reservás ' + s.nombre.toLowerCase() + ' con ' + nombreBarbero(pref) +
+                    '. Si preferís a otra persona, tocá "2 · Con quién".');
+          irA(3);
+          cargarHorarios();
+          return;
+        }
+        if (pref) {
+          // Pidió a alguien que no hace este servicio: se lo decimos claro
+          // en vez de cambiarle el barbero sin avisar.
+          avisoInfo(nombreBarbero(pref) + ' no hace ' + s.nombre.toLowerCase() +
+                    '. Elegí con quién querés hacerlo.');
+        }
+        if (s.barberos.indexOf(estado.barberoId) < 0) estado.barberoId = 'cualquiera';
         pintarBarberos();
         irA(2);
       });
@@ -168,6 +193,9 @@
         '<span class="op-detalle">' + escapar(b.descripcion || '') + '</span></span>';
       btn.addEventListener('click', function () {
         estado.barberoId = b.id;
+        // Elegir a mano en el paso 2 reemplaza lo que vino desde el sitio.
+        estado.preferido = b.id === 'cualquiera' ? null : b.id;
+        ocultarAviso(avisoGlobal);
         estado.hora = '';
         cont.querySelectorAll('.opcion').forEach(function (o) { o.setAttribute('aria-pressed', 'false'); });
         btn.setAttribute('aria-pressed', 'true');
@@ -343,10 +371,8 @@
       var existe = estado.catalogo.barberos.some(function (b) { return b.id === barberoPedido; });
       if (existe) {
         estado.barberoId = barberoPedido;
-        // No saltamos pasos: primero hay que elegir servicio igual, pero
-        // dejamos preseleccionado a quién quiere.
-        mostrarAviso(avisoGlobal, 'Vas a reservar con ' + nombreBarbero(barberoPedido) + '. Elegí primero el servicio.');
-        avisoGlobal.classList.remove('error');
+        estado.preferido = barberoPedido;
+        avisoInfo('Vas a reservar con ' + nombreBarbero(barberoPedido) + '. Elegí el servicio.');
       }
     }
   });
